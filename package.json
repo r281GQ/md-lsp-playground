@@ -1,0 +1,35 @@
+{
+  "name": "md",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^3.29.0",
+    "json-rpc2": "^2.0.0",
+    "nodemon": "^2.0.16",
+    "tree-sitter": "^0.20.0",
+    "tree-sitter-javascript": "^0.19.0",
+    "tree-sitter-markdown": "^0.7.1",
+    "vscode": "^1.1.37",
+    "vscode-languageclient": "^8.0.1",
+    "vscode-languageserver": "^8.0.1",
+    "vscode-languageserver-textdocument": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.33",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "eslint": "^8.15.0",
+    "eslint-config": "^0.3.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.4"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "client": "nodemon src/client.ts",
+    "watch": "tsc -b -w"
+  }
+}

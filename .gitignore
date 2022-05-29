@@ -1,0 +1,7 @@
+node_modules/
+
+build/
+
+index-macos
+index-linux
+index-win.exe

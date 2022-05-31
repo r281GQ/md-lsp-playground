@@ -4,6 +4,7 @@
   "main": "build/index.js",
   "license": "MIT",
   "dependencies": {
+    "chokidar": "^3.5.3",
     "fastify": "^3.29.0",
     "json-rpc2": "^2.0.0",
     "nodemon": "^2.0.16",
@@ -30,6 +31,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "client": "nodemon src/client.ts",
-    "watch": "tsc -b -w"
+    "watch": "tsc -b -w",
+    "build": "tsc && pkg build/index.js"
   }
 }

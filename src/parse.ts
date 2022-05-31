@@ -4,7 +4,7 @@ import Markdown from "tree-sitter-markdown";
 // @ts-ignore
 import JavaScript from "tree-sitter-javascript";
 
-const mdParser = new Parser();
+export const mdParser = new Parser();
 const jsParser = new Parser();
 
 jsParser.setLanguage(JavaScript);

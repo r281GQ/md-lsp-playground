@@ -1,29 +1,29 @@
 import { watch } from "chokidar";
-import { WorkspaceFoldersInitializeParams } from "vscode-languageserver-protocol/lib/common/protocol.workspaceFolder";
+import fsPromise from "fs/promises";
+import { join } from "path";
 import { createConnection } from "vscode-languageserver/node";
 
 const connection = createConnection(process.stdin, process.stdout);
 
-const worskSpaces = new Map<
-  number,
-  WorkspaceFoldersInitializeParams["workspaceFolders"]
->();
-
-const events: {
-  event: "add" | "addDir" | "change" | "unlink" | "unlinkDir";
-  path: string;
-}[] = [];
+const files = new Map<string, string>();
 
 connection.onInitialize((request) => {
   const projectFolders = request.workspaceFolders;
 
   if (projectFolders && request.processId) {
-    worskSpaces.set(request.processId, projectFolders);
-
     const watcher = watch("*.md", { cwd: projectFolders[0].name });
 
-    watcher.on("all", (event, path) => {
-      events.push({ event, path });
+    watcher.on("all", async (event, path) => {
+      const pathAsKey = join(projectFolders[0].name, path);
+
+      if (event === "add" || event === "change") {
+        const file = await fsPromise.readFile(
+          join(projectFolders[0].name, path),
+          "utf8"
+        );
+
+        files.set(pathAsKey, file);
+      }
     });
   }
 
@@ -37,6 +37,12 @@ connection.onInitialize((request) => {
 
 connection.onHover((request) => {
   const line = request.position.line;
+
+  const filesArray: string[] = [];
+
+  files.forEach((e) => {
+    filesArray.push(e);
+  });
 
   return {
     toJson: () => {
@@ -55,7 +61,8 @@ connection.onHover((request) => {
         ? [
             { value: "test hover text", language: "md" },
             // @ts-ignore
-            { value: JSON.stringify(events), language: "md" },
+            { value: JSON.stringify(request.textDocument), language: "md" },
+            { value: JSON.stringify(filesArray), language: "md" },
           ]
         : [],
   };

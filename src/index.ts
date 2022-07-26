@@ -45,6 +45,86 @@ connection.onInitialize((request) => {
   };
 });
 
+const convertUriToAbsolutePath = (uri: string): string => {
+  return uri;
+};
+
+connection.onCompletion(async (req) => {
+  // TODO: parse the file and check against current position.
+  const filesArray: { path: string; content: string }[] = [];
+
+  const readFile = await fsPromise.readFile(
+    req.textDocument.uri.replace("file://", ""),
+    "utf8"
+  );
+
+  files.forEach((e, key) => {
+    filesArray.push({
+      path: key.split("/")[key.split("/").length - 1],
+      content: e,
+    });
+  });
+
+  const tree = mdParser.parse(readFile);
+
+  const nodes = traversal(tree);
+
+  const linkNodes = nodes.filter(isLinkJournalReference);
+
+  const { line, character } = req.position;
+
+  let res: CompletionItem[] = [];
+
+  for (const node of linkNodes) {
+    if (node) {
+      const { row, column } = node.startPosition;
+
+      node.endPosition;
+
+      const payload = {
+        req: req.position,
+        start: node.startPosition,
+        end: node.endPosition,
+      };
+
+      res = [
+        { label: JSON.stringify(req.context?.triggerKind) },
+        {
+          label: req.context?.triggerCharacter ?? "default",
+        },
+        {
+          label: req.textDocument.uri ?? "default",
+        },
+      ];
+
+      if (payload.req.line === payload.start.row) {
+        res = filesArray.map((r) => ({
+          label: r.path,
+          kind: CompletionItemKind.File,
+        }));
+      }
+    }
+  }
+
+  return {
+    // items: filesArray.map((i) => ({ label: i.path, detail: i.content })),
+    items: res,
+    //items: [{ kind: CompletionItemKind.File, label: "" }],
+    isIncomplete: false,
+    toJson: () => {
+      return { code: 345, message: "" };
+    },
+    range: {
+      start: { line: 3, character: 1 },
+      end: { line: 3, character: 20 },
+    },
+    message: "message from hover",
+    code: 435,
+    data: "test data",
+    name: "test name",
+  };
+});
+
 connection.onHover((request) => {
   const line = request.position.line;
 

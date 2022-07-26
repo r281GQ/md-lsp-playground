@@ -2,6 +2,10 @@ import { watch } from "chokidar";
 import fsPromise from "fs/promises";
 import { join } from "path";
 import { createConnection } from "vscode-languageserver/node";
+import { CompletionItem, CompletionItemKind } from "vscode-languageserver";
+
+import { mdParser } from "./parse";
+import { isLinkJournalReference, traversal } from "./traversal";
 
 const connection = createConnection(process.stdin, process.stdout);
 
@@ -28,9 +32,15 @@ connection.onInitialize((request) => {
   }
 
   return {
-    capabilities: { hoverProvider: true },
+    capabilities: {
+      hoverProvider: true,
+      completionProvider: {
+        completionItem: { labelDetailsSupport: true },
+        triggerCharacters: [":", "@"],
+      },
+    },
     serverInfo: {
-      name: "Zettle TS POC",
+      name: "zettel",
     },
   };
 });
